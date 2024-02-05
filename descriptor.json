@@ -1,0 +1,122 @@
+{
+  "name": "S_CerviCare_Class",
+  "description": "Classification of pap smear to Normal and Abnormal (Cervical Cancer)",
+  "container-image": {
+    "image": "mizjaggy18/s_cervicare_class",
+    "type": "singularity"
+  },
+  "command-line": "echo [CYTOMINE_HOST] [CYTOMINE_PUBLIC_KEY] [CYTOMINE_PRIVATE_KEY] [CYTOMINE_ID_PROJECT] [CYTOMINE_ID_SOFTWARE] [CYTOMINE_ID_IMAGES] [CYTOMINE_ID_ROI_TERM] [CYTOMINE_ID_CELL_TERM] [CYTOMINE_ID_C0_TERM] [CYTOMINE_ID_C1_TERM]",
+  "inputs": [
+    {
+      "id": "cytomine_host",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine host",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String"
+    },
+    {
+      "id": "cytomine_public_key",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine public key",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String"
+    },
+    {
+      "id": "cytomine_private_key",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine private key",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String"
+    },
+    {
+      "id": "cytomine_id_project",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine project ID",
+      "set-by-server": true,
+      "optional": false,
+      "type": "Number"
+    },
+    {
+      "id": "cytomine_id_software",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine software ID",
+      "set-by-server": true,
+      "optional": false,
+      "type": "Number"
+    },
+    {
+      "id": "cytomine_id_images",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine Image IDs",
+      "description": "Images on which to classify objects",
+      "optional": false,
+      "type": "ListDomain",
+      "uri": "/api/project/$currentProject$/imageinstance.json",
+      "uri-print-attribute": "instanceFilename",
+      "uri-sort-attribute": "created"
+    },
+
+	{
+	    "id": "cytomine_id_roi_term",
+	    "value-key": "[@ID]",
+	    "command-line-flag": "--@id",
+	    "name": "Cytomine ROI term ID",
+	    "description": "Ontology term ID for ROI(s) where to detect cells",
+	    "set-by-server": false,
+	    "optional": false,
+	    "type": "Domain",
+	    "uri": "/api/ontology/$currentOntology$/term.json",
+	    "uri-print-attribute": "name",
+	    "uri-sort-attribute": "name"
+	},
+
+	{
+	    "id": "cytomine_id_cell_term",
+	    "value-key": "[@ID]",
+	    "command-line-flag": "--@id",
+	    "name": "Cytomine Cell term ID",
+	    "description": "Ontology term ID for Cell to be detected",
+	    "set-by-server": false,
+	    "optional": false,
+	    "type": "Domain",
+	    "uri": "/api/ontology/$currentOntology$/term.json",
+	    "uri-print-attribute": "name",
+	    "uri-sort-attribute": "name"
+	},
+    {
+      "id": "cytomine_id_c0_term",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine class0 (Tumor) cell term ID",
+      "description": "Ontology term ID for the cells that will be classified as Class 0 (Tumor)",
+      "optional": false,
+      "type": "Domain",
+      "uri": "/api/ontology/$currentOntology$/term.json",
+      "uri-print-attribute": "name",
+      "uri-sort-attribute": "name"
+    },
+    {
+      "id": "cytomine_id_c1_term",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "name": "Cytomine class1 (Normal) cell term ID",
+      "description": "Ontology term ID for the cells that will be classified as Class 1 (Normal)",
+      "optional": false,
+      "type": "Domain",
+      "uri": "/api/ontology/$currentOntology$/term.json",
+      "uri-print-attribute": "name",
+      "uri-sort-attribute": "name"
+    }
+  ],
+
+  "schema-version": "cytomine-0.1"
+}

@@ -114,8 +114,9 @@ def run(cyto_job, parameters):
             imageinfo=ImageInstance(id=id_image,project=parameters.cytomine_id_project)
             imageinfo.fetch()
             calibration_factor=imageinfo.resolution
+            
             roi_annotations = AnnotationCollection(
-                terms=[parameters.cytomine_id_roi_term],
+                terms=[parameters.cytomine_id_cell_term],
                 project=parameters.cytomine_id_project,
                 image=id_image, #conn.parameters.cytomine_id_image
                 showWKT = True,

@@ -149,55 +149,52 @@ def run(cyto_job, parameters):
                         gc.collect()
                         print("i==", inc)
 
-                # try:
+                try:
 
-                roi_geometry = wkt.loads(roi.location)
+                    roi_geometry = wkt.loads(roi.location)
+    
+                    #Dump ROI image into local PNG file
+                    roi_path=os.path.join(working_path,str(roi_annotations.project)+'/'+str(roi_annotations.image)+'/'+str(roi.id))
+                    roi_png_filename=os.path.join(roi_path+'/'+str(roi.id)+'.png')
+                    # print("roi_png_filename: %s" %roi_png_filename)
+                    is_algo = User().fetch(roi.user).algo
+                    roi.dump(dest_pattern=roi_png_filename,mask=True,alpha=not is_algo)
+    
+                    im = cv2.cvtColor(cv2.imread(roi_png_filename),cv2.COLOR_BGR2RGB)
+                    im = cv2.resize(im,(224,224))
+                    im = im.reshape(-1,224,224,3)
+                    output = np.zeros((0,checkpoint["num_classes"]))
+                    arr_out_gpu = torch.from_numpy(im.transpose(0, 3, 1, 2)).type('torch.FloatTensor').to(device)
+                    output_batch = model(arr_out_gpu)
+                    output_batch = output_batch.detach().cpu().numpy()                
+                    output = np.append(output,output_batch,axis=0)
+                    pred_labels = np.argmax(output, axis=1)
+                    # pred_labels=[pred_labels]
+                    pred_all.append(pred_labels)
+    
+                    if pred_labels[0]==0:
+                        # print("Class 0: Normal")
+                        id_terms=parameters.cytomine_id_c0_term
+                        pred_c0=pred_c0+1
+                    elif pred_labels[0]==1:
+                        # print("Class 1: Tumor")
+                        id_terms=parameters.cytomine_id_c1_term
+                        pred_c1=pred_c1+1
+                    
+                    cytomine_annotations = AnnotationCollection()
+                    annotation=roi_geometry
+                    
+                    cytomine_annotations.append(Annotation(location=annotation.wkt,#location=roi_geometry,
+                                                        id_image=id_image,#conn.parameters.cytomine_id_image,
+                                                        id_project=project.id,
+                                                        id_terms=[id_terms]))
+    
+    
+                    #Send Annotation Collection (for this ROI) to Cytomine server in one http request
+                    ca = cytomine_annotations.save()
 
-                #Dump ROI image into local PNG file
-                roi_path=os.path.join(working_path,str(roi_annotations.project)+'/'+str(roi_annotations.image)+'/'+str(roi.id))
-                roi_png_filename=os.path.join(roi_path+'/'+str(roi.id)+'.png')
-                print("roi_png_filename: %s" %roi_png_filename)
-                is_algo = User().fetch(roi.user).algo
-                roi.dump(dest_pattern=roi_png_filename,mask=True,alpha=not is_algo)
-
-                im = cv2.cvtColor(cv2.imread(roi_png_filename),cv2.COLOR_BGR2RGB)
-                im = cv2.resize(im,(224,224))
-                im = im.reshape(-1,224,224,3)
-                output = np.zeros((0,checkpoint["num_classes"]))
-                arr_out_gpu = torch.from_numpy(im.transpose(0, 3, 1, 2)).type('torch.FloatTensor').to(device)
-                output_batch = model(arr_out_gpu)
-                output_batch = output_batch.detach().cpu().numpy()                
-                output = np.append(output,output_batch,axis=0)
-                pred_labels = np.argmax(output, axis=1)
-                print("Predicted label: ",pred_labels)
-                print("Predicted label: ",pred_labels[0])
-                # pred_labels=[pred_labels]
-                pred_all.append(pred_labels)
-
-                if pred_labels[0]==0:
-                    print("Class 0: Normal")
-                    id_terms=parameters.cytomine_id_c0_term
-                    pred_c0=pred_c0+1
-                elif pred_labels[0]==1:
-                    print("Class 1: Tumor")
-                    id_terms=parameters.cytomine_id_c1_term
-                    pred_c1=pred_c1+1
-                
-                cytomine_annotations = AnnotationCollection()
-                annotation=roi_geometry
-                
-                cytomine_annotations.append(Annotation(location=annotation.wkt,#location=roi_geometry,
-                                                    id_image=id_image,#conn.parameters.cytomine_id_image,
-                                                    id_project=project.id,
-                                                    id_terms=[id_terms]))
-                print(".",end = '',flush=True)
-
-
-                #Send Annotation Collection (for this ROI) to Cytomine server in one http request
-                ca = cytomine_annotations.save()
-
-                # except:
-                #     print("An exception occurred. Proceed with next annotations")
+                except:
+                    print("An exception occurred. Proceed with next annotations")
 
 
             end_prediction_time=time.time()

@@ -169,15 +169,17 @@ def run(cyto_job, parameters):
                     output_batch = output_batch.detach().cpu().numpy()                
                     output = np.append(output,output_batch,axis=0)
                     pred_labels = np.argmax(output, axis=1)
+                    print("Predicted label: ",pred_labels)
+                    print("Predicted label: ",pred_labels[0])
                     # pred_labels=[pred_labels]
                     pred_all.append(pred_labels)
 
                     if pred_labels[0]==0:
-                        # print("Class 0: Normal")
+                        print("Class 0: Normal")
                         id_terms=parameters.cytomine_id_c0_term
                         pred_c0=pred_c0+1
                     elif pred_labels[0]==1:
-                        # print("Class 1: Tumor")
+                        print("Class 1: Tumor")
                         id_terms=parameters.cytomine_id_c1_term
                         pred_c1=pred_c1+1
                     
